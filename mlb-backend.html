@@ -1,1 +1,939 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Court Edge MLB Backend Console</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121a31;
+      --panel-2: #1a2442;
+      --border: #2f3d68;
+      --text: #e9eefc;
+      --muted: #9fb0df;
+      --accent: #57d0ff;
+      --accent-2: #6cffad;
+      --danger: #ff6b7a;
+      --warn: #ffcc66;
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #09101d 0%, #0d1530 55%, #0a1120 100%);
+      color: var(--text);
+    }
+
+    .wrap {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 18px;
+      padding: 22px;
+      background: rgba(18, 26, 49, 0.92);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero h1 {
+      margin: 0 0 6px;
+      font-size: 30px;
+      letter-spacing: 0.5px;
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .badge-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .badge {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(87, 208, 255, 0.08);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: rgba(18, 26, 49, 0.94);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(47, 61, 104, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .card-header h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .col-12 { grid-column: span 12; }
+    .col-8 { grid-column: span 8; }
+    .col-6 { grid-column: span 6; }
+    .col-4 { grid-column: span 4; }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+
+    .field input,
+    .field select,
+    .field textarea {
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #0d1630;
+      color: var(--text);
+      outline: none;
+    }
+
+    .field textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 11px 15px;
+      font-weight: 700;
+      cursor: pointer;
+      color: #03101f;
+      background: var(--accent);
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button.secondary {
+      background: #24355f;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    button.success {
+      background: var(--accent-2);
+    }
+
+    button.warn {
+      background: var(--warn);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .summary-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(26, 36, 66, 0.92);
+      border: 1px solid rgba(47, 61, 104, 0.7);
+    }
+
+    .summary-box .label {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-box .value {
+      font-size: 22px;
+      font-weight: 800;
+    }
+
+    .status-bar {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(26, 36, 66, 0.9);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 16px;
+      white-space: pre-wrap;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(47, 61, 104, 0.7);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 920px;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(47, 61, 104, 0.55);
+      text-align: left;
+      font-size: 13px;
+      vertical-align: top;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: #132042;
+      color: #dbe8ff;
+      z-index: 1;
+    }
+
+    tr:hover td {
+      background: rgba(87, 208, 255, 0.04);
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(87, 208, 255, 0.10);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 11px;
+      border: 1px solid rgba(87, 208, 255, 0.25);
+    }
+
+    .lineup-card {
+      border: 1px solid rgba(47, 61, 104, 0.7);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(26, 36, 66, 0.92);
+      margin-bottom: 12px;
+    }
+
+    .lineup-top {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .lineup-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    @media (max-width: 1150px) {
+      .col-8, .col-6, .col-4 { grid-column: span 12; }
+      .controls-grid, .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero { flex-direction: column; align-items: flex-start; }
+      .badge-row { justify-content: flex-start; }
+    }
+
+    @media (max-width: 700px) {
+      .controls-grid, .summary-grid { grid-template-columns: 1fr; }
+      .wrap { padding: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <h1>Court Edge MLB Console</h1>
+        <p>Upload a FanDuel or DraftKings MLB CSV, score the slate, inspect stacks, generate lineups, and export results from one page.</p>
+      </div>
+      <div class="badge-row">
+        <div class="badge" id="siteBadge">Site: —</div>
+        <div class="badge" id="slateBadge">Slate: —</div>
+        <div class="badge" id="capBadge">Cap: —</div>
+      </div>
+    </section>
+
+    <div class="status-bar" id="statusBox">Ready. Rename your repo file from mlb-backend.tml to mlb-backend.html before opening it in the browser.</div>
+
+    <div class="grid">
+      <section class="card col-12">
+        <div class="card-header">
+          <h2>Backend Connection + Slate Upload</h2>
+        </div>
+        <div class="card-body">
+          <div class="controls-grid">
+            <div class="field">
+              <label for="backendUrl">Backend Base URL</label>
+              <input id="backendUrl" type="text" value="http://127.0.0.1:8000" placeholder="http://127.0.0.1:8000" />
+            </div>
+            <div class="field">
+              <label for="siteSelect">Site</label>
+              <select id="siteSelect">
+                <option value="draftkings">DraftKings</option>
+                <option value="fanduel">FanDuel</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="csvFile">Slate CSV</label>
+              <input id="csvFile" type="file" accept=".csv" />
+            </div>
+            <div class="field">
+              <label for="currentSlateId">Current Slate ID</label>
+              <input id="currentSlateId" type="text" placeholder="Filled after upload" />
+            </div>
+          </div>
+          <div class="actions">
+            <button id="pingBtn" class="secondary">Check Health</button>
+            <button id="configBtn" class="secondary">Load Site Config</button>
+            <button id="uploadBtn">Upload CSV</button>
+            <button id="loadSlateBtn" class="secondary">Load Existing Slate</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card col-12">
+        <div class="card-header">
+          <h2>Slate Summary</h2>
+        </div>
+        <div class="card-body">
+          <div class="summary-grid">
+            <div class="summary-box">
+              <div class="label">Players</div>
+              <div class="value" id="playersCount">0</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Teams</div>
+              <div class="value" id="teamsCount">0</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Top Stack</div>
+              <div class="value" id="topStackName">—</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Top Pitcher</div>
+              <div class="value" id="topPitcherName">—</div>
+            </div>
+            <div class="summary-box">
+              <div class="label">Lineups Built</div>
+              <div class="value" id="lineupCount">0</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card col-12">
+        <div class="card-header">
+          <h2>Build Controls</h2>
+        </div>
+        <div class="card-body">
+          <div class="controls-grid">
+            <div class="field">
+              <label for="contestMode">Contest Mode</label>
+              <select id="contestMode">
+                <option value="cash">Cash</option>
+                <option value="single_entry" selected>Single Entry</option>
+                <option value="mme">MME</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="lineupCountInput">Lineup Count</label>
+              <input id="lineupCountInput" type="number" min="1" max="150" value="20" />
+            </div>
+            <div class="field">
+              <label for="randomnessFactor">Randomness Factor</label>
+              <input id="randomnessFactor" type="number" min="0" max="1" step="0.01" value="0.22" />
+            </div>
+            <div class="field">
+              <label for="uniquePlayersMin">Min Unique Players</label>
+              <input id="uniquePlayersMin" type="number" min="1" max="6" value="3" />
+            </div>
+            <div class="field">
+              <label for="primaryStackSize">Primary Stack Size</label>
+              <input id="primaryStackSize" type="number" min="2" max="5" value="4" />
+            </div>
+            <div class="field">
+              <label for="secondaryStackSize">Secondary Stack Size</label>
+              <input id="secondaryStackSize" type="number" min="0" max="5" value="3" />
+            </div>
+            <div class="field">
+              <label for="maxPitcherExposure">Max Pitcher Exposure</label>
+              <input id="maxPitcherExposure" type="number" min="0" max="1" step="0.01" value="0.55" />
+            </div>
+            <div class="field">
+              <label for="maxHitterExposure">Max Hitter Exposure</label>
+              <input id="maxHitterExposure" type="number" min="0" max="1" step="0.01" value="0.70" />
+            </div>
+            <div class="field">
+              <label for="maxTotalOwnership">Max Total Ownership</label>
+              <input id="maxTotalOwnership" type="number" min="0" step="0.1" placeholder="Optional" />
+            </div>
+            <div class="field">
+              <label for="minSalaryUsed">Min Salary Used</label>
+              <input id="minSalaryUsed" type="number" min="0" placeholder="Optional" />
+            </div>
+            <div class="field">
+              <label for="preferredTeams">Preferred Primary Teams</label>
+              <input id="preferredTeams" type="text" placeholder="LAD,NYY,ATL" />
+            </div>
+            <div class="field">
+              <label for="excludedTeams">Excluded Teams</label>
+              <input id="excludedTeams" type="text" placeholder="MIA,WSH" />
+            </div>
+            <div class="field">
+              <label for="lockedPlayers">Locked Player IDs</label>
+              <textarea id="lockedPlayers" placeholder="Comma separated IDs"></textarea>
+            </div>
+            <div class="field">
+              <label for="excludedPlayers">Excluded Player IDs</label>
+              <textarea id="excludedPlayers" placeholder="Comma separated IDs"></textarea>
+            </div>
+          </div>
+          <div class="actions">
+            <button id="scoreBtn" class="secondary">Score Slate</button>
+            <button id="refreshPlayersBtn" class="secondary">Refresh Player Pool</button>
+            <button id="stackBtn" class="secondary">Load Stacks</button>
+            <button id="optimizeBtn">Generate Lineups</button>
+            <button id="exportBtn" class="success">Export CSV</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="card col-8">
+        <div class="card-header">
+          <h2>Player Pool</h2>
+          <span class="small">Scored slate data from the backend</span>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Team</th>
+                  <th>Pos</th>
+                  <th>Salary</th>
+                  <th>Proj</th>
+                  <th>Ceiling</th>
+                  <th>Own</th>
+                  <th>Median</th>
+                  <th>Stack</th>
+                  <th>Lev</th>
+                </tr>
+              </thead>
+              <tbody id="playersTbody">
+                <tr><td colspan="10" class="muted">No slate loaded yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card col-4">
+        <div class="card-header">
+          <h2>Stack Dashboard</h2>
+          <span class="small">Top team stacks</span>
+        </div>
+        <div class="card-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Team</th>
+                  <th>Raw</th>
+                  <th>Ceiling</th>
+                  <th>Lev</th>
+                  <th>Chalk</th>
+                </tr>
+              </thead>
+              <tbody id="stacksTbody">
+                <tr><td colspan="5" class="muted">No stack data yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="card col-12">
+        <div class="card-header">
+          <h2>Generated Lineups</h2>
+          <span class="small">Live output from optimize endpoint</span>
+        </div>
+        <div class="card-body">
+          <div id="lineupsContainer"><div class="muted">No lineups generated yet.</div></div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      currentSlateId: "",
+      currentSite: "draftkings",
+      currentConfig: null,
+      players: [],
+      stacks: [],
+      lineups: []
+    };
+
+    const els = {
+      backendUrl: document.getElementById("backendUrl"),
+      siteSelect: document.getElementById("siteSelect"),
+      csvFile: document.getElementById("csvFile"),
+      currentSlateId: document.getElementById("currentSlateId"),
+      contestMode: document.getElementById("contestMode"),
+      lineupCountInput: document.getElementById("lineupCountInput"),
+      randomnessFactor: document.getElementById("randomnessFactor"),
+      uniquePlayersMin: document.getElementById("uniquePlayersMin"),
+      primaryStackSize: document.getElementById("primaryStackSize"),
+      secondaryStackSize: document.getElementById("secondaryStackSize"),
+      maxPitcherExposure: document.getElementById("maxPitcherExposure"),
+      maxHitterExposure: document.getElementById("maxHitterExposure"),
+      maxTotalOwnership: document.getElementById("maxTotalOwnership"),
+      minSalaryUsed: document.getElementById("minSalaryUsed"),
+      preferredTeams: document.getElementById("preferredTeams"),
+      excludedTeams: document.getElementById("excludedTeams"),
+      lockedPlayers: document.getElementById("lockedPlayers"),
+      excludedPlayers: document.getElementById("excludedPlayers"),
+      statusBox: document.getElementById("statusBox"),
+      playersTbody: document.getElementById("playersTbody"),
+      stacksTbody: document.getElementById("stacksTbody"),
+      lineupsContainer: document.getElementById("lineupsContainer"),
+      playersCount: document.getElementById("playersCount"),
+      teamsCount: document.getElementById("teamsCount"),
+      topStackName: document.getElementById("topStackName"),
+      topPitcherName: document.getElementById("topPitcherName"),
+      lineupCount: document.getElementById("lineupCount"),
+      siteBadge: document.getElementById("siteBadge"),
+      slateBadge: document.getElementById("slateBadge"),
+      capBadge: document.getElementById("capBadge"),
+      pingBtn: document.getElementById("pingBtn"),
+      configBtn: document.getElementById("configBtn"),
+      uploadBtn: document.getElementById("uploadBtn"),
+      loadSlateBtn: document.getElementById("loadSlateBtn"),
+      scoreBtn: document.getElementById("scoreBtn"),
+      refreshPlayersBtn: document.getElementById("refreshPlayersBtn"),
+      stackBtn: document.getElementById("stackBtn"),
+      optimizeBtn: document.getElementById("optimizeBtn"),
+      exportBtn: document.getElementById("exportBtn")
+    };
+
+    function baseUrl() {
+      return els.backendUrl.value.trim().replace(/\/$/, "");
+    }
+
+    function setStatus(message, isError = false) {
+      els.statusBox.textContent = message;
+      els.statusBox.style.color = isError ? "#ffb3bc" : "#9fb0df";
+      els.statusBox.style.borderColor = isError ? "rgba(255,107,122,0.55)" : "#2f3d68";
+    }
+
+    function updateBadges() {
+      els.siteBadge.textContent = `Site: ${state.currentSite || "—"}`;
+      els.slateBadge.textContent = `Slate: ${state.currentSlateId || "—"}`;
+      const cap = state.currentConfig?.salary_cap ?? "—";
+      els.capBadge.textContent = `Cap: ${cap}`;
+    }
+
+    function parseCsvList(text) {
+      return text
+        .split(",")
+        .map(v => v.trim())
+        .filter(Boolean);
+    }
+
+    function buildRulesPayload() {
+      const payload = {
+        contest_mode: els.contestMode.value,
+        lineup_count: Number(els.lineupCountInput.value || 20),
+        randomness_factor: Number(els.randomnessFactor.value || 0.22),
+        primary_stack_size: Number(els.primaryStackSize.value || 4),
+        secondary_stack_size: Number(els.secondaryStackSize.value || 3),
+        unique_players_min: Number(els.uniquePlayersMin.value || 3),
+        max_pitcher_exposure: Number(els.maxPitcherExposure.value || 0.55),
+        max_hitter_exposure: Number(els.maxHitterExposure.value || 0.70),
+        preferred_primary_teams: parseCsvList(els.preferredTeams.value.toUpperCase()),
+        excluded_teams: parseCsvList(els.excludedTeams.value.toUpperCase()),
+        locked_player_ids: parseCsvList(els.lockedPlayers.value),
+        excluded_player_ids: parseCsvList(els.excludedPlayers.value)
+      };
+
+      if (els.maxTotalOwnership.value !== "") payload.max_total_ownership = Number(els.maxTotalOwnership.value);
+      if (els.minSalaryUsed.value !== "") payload.min_salary_used = Number(els.minSalaryUsed.value);
+      return payload;
+    }
+
+    async function safeFetch(url, options = {}) {
+      const res = await fetch(url, options);
+      if (!res.ok) {
+        let detail = `${res.status} ${res.statusText}`;
+        try {
+          const data = await res.json();
+          detail = data.detail || JSON.stringify(data);
+        } catch (err) {
+          detail = await res.text();
+        }
+        throw new Error(detail || "Request failed");
+      }
+      return res;
+    }
+
+    function renderPlayers(players) {
+      state.players = players || [];
+      if (!players.length) {
+        els.playersTbody.innerHTML = '<tr><td colspan="10" class="muted">No players found.</td></tr>';
+        els.playersCount.textContent = '0';
+        return;
+      }
+
+      const teamCount = new Set(players.map(p => String(p.team || "").toUpperCase()).filter(Boolean)).size;
+      els.playersCount.textContent = String(players.length);
+      els.teamsCount.textContent = String(teamCount);
+
+      const topPitcher = players
+        .filter(p => p.is_pitcher)
+        .sort((a, b) => Number(b.BuildScore_single_entry || 0) - Number(a.BuildScore_single_entry || 0))[0];
+      els.topPitcherName.textContent = topPitcher ? topPitcher.name : '—';
+
+      const rows = players
+        .slice()
+        .sort((a, b) => Number(b.BuildScore_single_entry || 0) - Number(a.BuildScore_single_entry || 0))
+        .slice(0, 80)
+        .map(player => {
+          const pos = Array.isArray(player.positions) ? player.positions.join('/') : (player.positions || '');
+          const median = player.HitterMedianScore ?? player.PitcherMedianScore ?? 0;
+          const stack = player.HitterStackScore ?? 0;
+          const lev = player.LeverageScore ?? player.PitcherLeverageScore ?? 0;
+          return `
+            <tr>
+              <td><strong>${player.name || ''}</strong></td>
+              <td>${player.team || ''}</td>
+              <td>${pos}</td>
+              <td>${Number(player.salary || 0).toLocaleString()}</td>
+              <td>${Number(player.projection || 0).toFixed(2)}</td>
+              <td>${Number(player.ceiling_projection || 0).toFixed(2)}</td>
+              <td>${Number(player.ownership || 0).toFixed(1)}</td>
+              <td>${Number(median).toFixed(1)}</td>
+              <td>${Number(stack).toFixed(1)}</td>
+              <td>${Number(lev).toFixed(1)}</td>
+            </tr>
+          `;
+        })
+        .join('');
+
+      els.playersTbody.innerHTML = rows;
+    }
+
+    function renderStacks(stacks) {
+      state.stacks = stacks || [];
+      if (!stacks.length) {
+        els.stacksTbody.innerHTML = '<tr><td colspan="5" class="muted">No stack data found.</td></tr>';
+        els.topStackName.textContent = '—';
+        return;
+      }
+
+      const topStack = stacks[0];
+      els.topStackName.textContent = topStack.team || '—';
+
+      els.stacksTbody.innerHTML = stacks.slice(0, 15).map(stack => `
+        <tr>
+          <td><span class="pill">${stack.team || ''}</span></td>
+          <td>${Number(stack.RawStackScore || 0).toFixed(1)}</td>
+          <td>${Number(stack.CeilingStackScore || 0).toFixed(1)}</td>
+          <td>${Number(stack.LeverageStackScore || 0).toFixed(1)}</td>
+          <td>${Number(stack.ChalkRiskScore || 0).toFixed(1)}</td>
+        </tr>
+      `).join('');
+    }
+
+    function renderLineups(lineups) {
+      state.lineups = lineups || [];
+      els.lineupCount.textContent = String(lineups.length || 0);
+      if (!lineups.length) {
+        els.lineupsContainer.innerHTML = '<div class="muted">No lineups generated yet.</div>';
+        return;
+      }
+
+      els.lineupsContainer.innerHTML = lineups.map(lineup => {
+        const playersRows = lineup.players.map(player => `
+          <tr>
+            <td>${player.slot}</td>
+            <td><strong>${player.name}</strong></td>
+            <td>${player.team}</td>
+            <td>${Array.isArray(player.positions) ? player.positions.join('/') : ''}</td>
+            <td>${Number(player.salary || 0).toLocaleString()}</td>
+            <td>${Number(player.projection || 0).toFixed(2)}</td>
+            <td>${Number(player.ceiling_projection || 0).toFixed(2)}</td>
+            <td>${Number(player.ownership || 0).toFixed(1)}</td>
+          </tr>
+        `).join('');
+
+        return `
+          <div class="lineup-card">
+            <div class="lineup-top">
+              <div>
+                <strong>Lineup ${lineup.lineup_number}</strong>
+                <div class="small">Primary: ${lineup.primary_stack_team || '—'} | Secondary: ${lineup.secondary_stack_team || '—'}</div>
+              </div>
+              <div class="lineup-meta">
+                <span class="pill">Salary ${Number(lineup.salary_used || 0).toLocaleString()}</span>
+                <span class="pill">Proj ${Number(lineup.projected_points || 0).toFixed(2)}</span>
+                <span class="pill">Ceiling ${Number(lineup.projected_ceiling || 0).toFixed(2)}</span>
+                <span class="pill">Own ${Number(lineup.ownership_total || 0).toFixed(1)}</span>
+                <span class="pill">Lev ${Number(lineup.leverage_score || 0).toFixed(1)}</span>
+                <span class="pill">Dup ${Number(lineup.duplication_risk || 0).toFixed(1)}</span>
+              </div>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Slot</th>
+                    <th>Name</th>
+                    <th>Team</th>
+                    <th>Pos</th>
+                    <th>Salary</th>
+                    <th>Proj</th>
+                    <th>Ceiling</th>
+                    <th>Own</th>
+                  </tr>
+                </thead>
+                <tbody>${playersRows}</tbody>
+              </table>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function loadConfig() {
+      const site = els.siteSelect.value;
+      const res = await safeFetch(`${baseUrl()}/api/mlb/sites/${site}/config`);
+      const config = await res.json();
+      state.currentSite = config.site;
+      state.currentConfig = config;
+      if (!els.primaryStackSize.value) els.primaryStackSize.value = config.primary_stack_default;
+      if (!els.secondaryStackSize.value) els.secondaryStackSize.value = config.secondary_stack_default;
+      updateBadges();
+      setStatus(`Loaded ${config.site} config. Salary cap ${config.salary_cap}. Slots: ${config.slots.join(', ')}`);
+    }
+
+    async function checkHealth() {
+      const res = await safeFetch(`${baseUrl()}/health`);
+      const data = await res.json();
+      setStatus(`Backend is live: ${JSON.stringify(data)}`);
+    }
+
+    async function uploadCsv() {
+      const file = els.csvFile.files[0];
+      if (!file) {
+        throw new Error('Choose a CSV file first.');
+      }
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await safeFetch(`${baseUrl()}/api/mlb/upload-csv`, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await res.json();
+      state.currentSlateId = data.slate_id;
+      state.currentSite = data.site;
+      els.currentSlateId.value = data.slate_id;
+      els.siteSelect.value = data.site;
+      updateBadges();
+      els.playersCount.textContent = String(data.player_count || 0);
+      els.teamsCount.textContent = String(data.team_count || 0);
+      setStatus(`Uploaded ${data.uploaded_filename}. Slate ${data.slate_id} created for ${data.site}. Players: ${data.player_count}. Teams: ${data.team_count}.`);
+      await loadConfig();
+      await scoreSlate();
+      await loadPlayers();
+      await loadStacks();
+    }
+
+    async function loadExistingSlate() {
+      const slateId = els.currentSlateId.value.trim();
+      if (!slateId) throw new Error('Enter a slate ID first.');
+      const res = await safeFetch(`${baseUrl()}/api/mlb/slates/${slateId}`);
+      const data = await res.json();
+      state.currentSlateId = data.slate_id;
+      state.currentSite = data.site;
+      els.siteSelect.value = data.site;
+      updateBadges();
+      els.playersCount.textContent = String(data.player_count || 0);
+      els.teamsCount.textContent = String(data.team_count || 0);
+      setStatus(`Loaded slate ${data.slate_id} for ${data.site}.`);
+      await loadConfig();
+      await loadPlayers();
+      await loadStacks();
+    }
+
+    async function scoreSlate() {
+      if (!state.currentSlateId) throw new Error('Upload or load a slate first.');
+      const res = await safeFetch(`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/score`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ persist: true })
+      });
+      const data = await res.json();
+      const topPitcher = data.top_pitchers?.[0]?.name || '—';
+      const topStack = data.top_stacks?.[0]?.team || '—';
+      els.topPitcherName.textContent = topPitcher;
+      els.topStackName.textContent = topStack;
+      setStatus(`Slate scored. Top pitcher: ${topPitcher}. Top stack: ${topStack}.`);
+      if (Array.isArray(data.top_stacks)) renderStacks(data.top_stacks);
+    }
+
+    async function loadPlayers() {
+      if (!state.currentSlateId) throw new Error('Upload or load a slate first.');
+      const res = await safeFetch(`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/players?scored=true&include_excluded=true`);
+      const players = await res.json();
+      renderPlayers(players);
+      setStatus(`Loaded ${players.length} players from slate ${state.currentSlateId}.`);
+    }
+
+    async function loadStacks() {
+      if (!state.currentSlateId) throw new Error('Upload or load a slate first.');
+      const res = await safeFetch(`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/stacks`);
+      const stacks = await res.json();
+      renderStacks(stacks);
+      setStatus(`Loaded ${stacks.length} stack rows.`);
+    }
+
+    async function optimize() {
+      if (!state.currentSlateId) throw new Error('Upload or load a slate first.');
+      const payload = buildRulesPayload();
+      const res = await safeFetch(`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/optimize`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const lineups = await res.json();
+      renderLineups(lineups);
+      setStatus(`Generated ${lineups.length} lineups for slate ${state.currentSlateId}.`);
+    }
+
+    async function exportCsv() {
+      if (!state.currentSlateId) throw new Error('Upload or load a slate first.');
+      const payload = buildRulesPayload();
+      const res = await safeFetch(`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `court-edge-mlb-${state.currentSlateId || 'lineups'}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+      setStatus('CSV export downloaded.');
+    }
+
+    async function runAction(fn) {
+      try {
+        setStatus('Working...');
+        await fn();
+      } catch (error) {
+        console.error(error);
+        setStatus(`Error: ${error.message}`, true);
+      }
+    }
+
+    els.pingBtn.addEventListener('click', () => runAction(checkHealth));
+    els.configBtn.addEventListener('click', () => runAction(loadConfig));
+    els.uploadBtn.addEventListener('click', () => runAction(uploadCsv));
+    els.loadSlateBtn.addEventListener('click', () => runAction(loadExistingSlate));
+    els.scoreBtn.addEventListener('click', () => runAction(scoreSlate));
+    els.refreshPlayersBtn.addEventListener('click', () => runAction(loadPlayers));
+    els.stackBtn.addEventListener('click', () => runAction(loadStacks));
+    els.optimizeBtn.addEventListener('click', () => runAction(optimize));
+    els.exportBtn.addEventListener('click', () => runAction(exportCsv));
+
+    els.siteSelect.addEventListener('change', () => {
+      state.currentSite = els.siteSelect.value;
+      updateBadges();
+    });
+
+    updateBadges();
+  </script>
+</body>
+</html>
