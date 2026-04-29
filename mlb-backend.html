@@ -1,42 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" /><title>MLB Diamond Edge | Hard Frontend</title>
+    <meta charset="UTF-8" /><title>MLB Diamond Edge | Pro Optimizer</title>
     <style>
-        :root{--bg:#0b1020;--panel:#121a31;--border:#2f3d68;--text:#e9eefc;--accent:#57d0ff;--accent2:#6cffad;}
+        :root{--bg:#0b1020;--panel:#121a31;--border:#2f3d68;--text:#e9eefc;--accent:#57d0ff;--accent2:#6cffad;--warning:#ff9f43;}
         body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;padding:20px;}
-        .wrap{max-width:1200px;margin:0 auto;}
-        .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+        .wrap{max-width:1400px;margin:0 auto;}
+        .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 10px 30px rgba(0,0,0,0.3);}
         .grid{display:grid;grid-template-columns: 2fr 1fr;gap:20px;}
-        button{background:var(--accent);color:#000;border:none;padding:12px 20px;border-radius:8px;font-weight:700;cursor:pointer;margin-right:10px;}
+        button{background:var(--accent);color:#000;border:none;padding:12px 20px;border-radius:8px;font-weight:700;cursor:pointer;margin-right:10px;transition:0.2s;}
+        button:hover{filter:brightness(1.1);}
         button.sec{background:var(--accent2);}
+        button.vegas{background:var(--warning);}
         input, select{background:#0d1630;border:1px solid var(--border);color:#fff;padding:10px;border-radius:8px;margin-bottom:10px;width:100%;}
         .status-box{background:#000;color:var(--accent2);padding:15px;border-radius:8px;font-family:monospace;font-size:12px;margin-bottom:20px;max-height:150px;overflow-y:auto;border:1px solid var(--accent2);}
-        table{width:100%;border-collapse:collapse;margin-top:10px;}
-        th{text-align:left;background:rgba(255,255,255,0.05);padding:10px;}
-        td{padding:8px;border-bottom:1px solid var(--border);}
-        .lineup-item{background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;margin-bottom:10px;border-left:4px solid var(--accent);}
+        table{width:100%;border-collapse:collapse;}
+        th{text-align:left;background:rgba(255,255,255,0.05);padding:10px;font-size:12px;}
+        td{padding:8px;border-bottom:1px solid var(--border);font-size:13px;}
+        .lineup-item{background:rgba(255,255,255,0.03);padding:15px;border-radius:10px;margin-bottom:15px;border-left:5px solid var(--accent);}
+        .tag{font-size:10px;background:var(--accent);color:#000;padding:2px 6px;border-radius:4px;font-weight:bold;margin-left:10px;}
     </style>
 </head>
 <body>
 <div class="wrap">
-    <h1>MLB Diamond Edge <small style="font-size:12px;color:var(--accent2)">V1.1-STABLE</small></h1>
-    
-    <div class="status-box" id="debug">System Ready. Awaiting CSV...</div>
+    <h1>MLB Diamond Edge <small style="font-size:12px;color:var(--accent2)">V1.6 - PRO STACKING</small></h1>
+    <div class="status-box" id="debug">System Ready. Awaiting Slate...</div>
 
     <div class="grid">
         <div>
             <div class="card">
-                <h3>1. Upload & Process</h3>
-                <input type="file" id="csvFile" accept=".csv" />
-                <button onclick="processData()">Load Players</button>
-                <button class="sec" onclick="generate()">Generate Lineups</button>
+                <h3>1. Input & Controls</h3>
+                <div style="display:flex; gap:10px;">
+                    <input type="file" id="csvFile" accept=".csv" />
+                    <button onclick="processCSV()">Load CSV</button>
+                    <button class="vegas" onclick="syncVegas()">Sync Vegas</button>
+                </div>
+                <div style="margin-top:15px;">
+                    <button class="sec" style="width:100%" onclick="generate()">Generate Optimized Lineups</button>
+                </div>
             </div>
-
-            <div class="card">
+            <div class="card" style="max-height:600px; overflow-y:auto;">
                 <h3>Player Pool</h3>
                 <table id="playerTable">
-                    <thead><tr><th>Name</th><th>Pos</th><th>Team</th><th>Salary</th><th>Proj</th></tr></thead>
+                    <thead><tr><th>Name</th><th>Pos</th><th>Team</th><th>Salary</th><th>Proj</th><th>Status</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -45,21 +51,19 @@
         <div>
             <div class="card">
                 <h3>Settings</h3>
-                <label>Lineups</label><input type="number" id="num" value="10">
-                <label>Randomness</label><input type="number" id="rand" value="0.2" step="0.1">
-                <button style="width:100%" onclick="exportCSV()">Export to CSV</button>
+                <label>Max Team Stack</label><input type="number" id="stackSize" value="5">
+                <label>Randomness (Variance)</label><input type="number" id="rand" value="0.2" step="0.05">
+                <button style="width:100%" onclick="exportCSV()">Export to DraftKings</button>
             </div>
-
-            <div class="card">
-                <h3>Results</h3>
-                <div id="results"></div>
-            </div>
+            <div id="results"></div>
         </div>
     </div>
 </div>
 
 <script>
+    const HETZNER_IP = "5.78.101.177";
     let players = [];
+    let vegasData = null;
     let lineups = [];
 
     function log(msg) {
@@ -68,106 +72,110 @@
         d.scrollTop = d.scrollHeight;
     }
 
-    function processData() {
+    async function syncVegas() {
+        log("Syncing with Hetzner node...");
+        try {
+            const r = await fetch(`http://${HETZNER_IP}/live_slate.json`);
+            if (!r.ok) throw new Error("Server response was not OK");
+            vegasData = await r.json();
+            log(`SUCCESS: Vegas totals for ${vegasData.length} games synced.`);
+            if(players.length) processCSV(); // Re-process to apply boosts
+        } catch (e) {
+            log("CONNECTION ERROR: Make sure Nginx is updated with CORS headers.");
+        }
+    }
+
+    function processCSV() {
         const file = document.getElementById('csvFile').files[0];
-        if (!file) return log("ERROR: Select a file first.");
-        
-        log(`Reading: ${file.name}...`);
+        if (!file) return log("Error: Select a file first.");
         const reader = new FileReader();
-        
         reader.onload = function(e) {
-            const text = e.target.result;
-            const lines = text.split(/\r?\n/);
-            if (lines.length < 2) return log("ERROR: File appears empty.");
-
-            // Advanced Regex to handle quoted commas in names
+            const lines = e.target.result.split(/\r?\n/);
             const headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.trim().replace(/"/g, ''));
-            log(`Found Headers: ${headers.join(' | ')}`);
-
+            
             players = lines.slice(1).map(line => {
                 const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/"/g, ''));
-                if (cols.length < 3) return null;
-
-                const name = cols[headers.findIndex(h => /name|nickname/i.test(h))] || "Unknown";
-                const pos = cols[headers.findIndex(h => /pos/i.test(h))] || "??";
+                if (cols.length < 5) return null;
                 const team = cols[headers.findIndex(h => /team|abbr/i.test(h))] || "??";
-                const salary = parseInt(cols[headers.findIndex(h => /salary/i.test(h))]) || 0;
-                const proj = parseFloat(cols[headers.findIndex(h => /proj|fpts|avg/i.test(h))]) || (Math.random() * 8 + 4);
+                let proj = parseFloat(cols[headers.findIndex(h => /proj|fpts|avg/i.test(h))]) || 5.0;
+                let boost = "-";
 
-                return { name, pos, team, salary, proj };
+                // Apply Vegas Multiplier
+                if (vegasData) {
+                    const game = vegasData.find(g => g.home_team.includes(team) || g.away_team.includes(team));
+                    if (game) {
+                        const total = game.bookmakers[0]?.markets[0]?.outcomes[0]?.point || 0;
+                        if (total >= 9.0) { proj *= 1.15; boost = "🔥 " + total; }
+                    }
+                }
+
+                return {
+                    name: cols[headers.findIndex(h => /name|nickname/i.test(h))] || "??",
+                    pos: cols[headers.findIndex(h => /pos/i.test(h))] || "??",
+                    team: team,
+                    salary: parseInt(cols[headers.findIndex(h => /salary/i.test(h))]) || 0,
+                    proj: proj,
+                    boost: boost
+                };
             }).filter(p => p && p.salary > 0);
-
-            log(`Successfully parsed ${players.length} players.`);
             renderTable();
+            log(`Loaded ${players.length} players.`);
         };
         reader.readAsText(file);
     }
 
     function renderTable() {
         const html = players.slice(0, 50).map(p => `
-            <tr><td>${p.name}</td><td>${p.pos}</td><td>${p.team}</td><td>$${p.salary}</td><td>${p.proj.toFixed(2)}</td></tr>
+            <tr><td>${p.name}</td><td>${p.pos}</td><td>${p.team}</td><td>$${p.salary}</td><td>${p.proj.toFixed(2)}</td><td style="color:var(--accent2)">${p.boost}</td></tr>
         `).join('');
         document.querySelector('#playerTable tbody').innerHTML = html;
     }
 
     function generate() {
-        if (!players.length) return log("ERROR: No players loaded.");
-        const count = parseInt(document.getElementById('num').value);
+        if (!players.length) return log("Error: No data.");
+        const maxStack = parseInt(document.getElementById('stackSize').value);
         const rand = parseFloat(document.getElementById('rand').value);
         lineups = [];
 
-        log(`Generating ${count} lineups...`);
-
-        for (let i = 0; i < count; i++) {
-            let currentLineup = [];
+        for (let i = 0; i < 20; i++) {
+            let lineup = [];
             let budget = 50000;
-            let roster = ['P', 'P', 'C', '1B', '2B', '3B', 'SS', 'OF', 'OF', 'OF'];
-
-            let pool = [...players].sort((a, b) => 
-                (b.proj * (1 + Math.random() * rand)) - (a.proj * (1 + Math.random() * rand))
-            );
-
-            roster.forEach(slot => {
-                const pick = pool.find(p => p.pos.includes(slot) && !currentLineup.includes(p) && p.salary <= (budget - 2000));
-                if (pick) {
-                    currentLineup.push(pick);
-                    budget -= pick.salary;
-                }
+            const teams = [...new Set(players.map(p => p.team))];
+            const targetTeam = teams[Math.floor(Math.random() * teams.length)];
+            
+            let pool = [...players].sort((a,b) => (b.proj * (1 + Math.random() * rand)) - (a.proj * (1 + Math.random() * rand)));
+            
+            ['P','P','C','1B','2B','3B','SS','OF','OF','OF'].forEach(pos => {
+                const pick = pool.find(p => p.pos.includes(pos) && !lineup.includes(p) && p.salary <= (budget-1000) && 
+                (lineup.filter(lp => lp.team === targetTeam).length < maxStack || p.team !== targetTeam));
+                if (pick) { lineup.push(pick); budget -= pick.salary; }
             });
 
-            if (currentLineup.length >= 8) {
-                lineups.push({ 
-                    id: i+1, 
-                    pts: currentLineup.reduce((a,b)=>a+b.proj, 0), 
-                    sal: 50000-budget, 
-                    names: currentLineup.map(p => p.name).join(', ') 
-                });
+            if (lineup.length >= 9) {
+                lineups.push({ id: i+1, score: lineup.reduce((a,b)=>a+b.proj,0), sal: 50000-budget, names: lineup.map(p=>p.name).join(', '), stack: targetTeam });
             }
         }
-        
-        log(`Built ${lineups.length} valid lineups.`);
         renderResults();
     }
 
     function renderResults() {
         document.getElementById('results').innerHTML = lineups.map(l => `
             <div class="lineup-item">
-                <strong>#${l.id} | ${l.pts.toFixed(2)} Pts</strong><br>
-                <small>$${l.sal} | ${l.names}</small>
+                <strong>LINEUP #${l.id} <span class="tag">${l.stack} STACK</span></strong><br>
+                <small>${l.score.toFixed(2)} Projected Pts | $${l.sal} Used</small><br>
+                <div style="font-size:11px; color:var(--accent)">${l.names}</div>
             </div>
         `).join('');
     }
 
     function exportCSV() {
-        if (!lineups.length) return log("ERROR: No lineups to export.");
-        let csv = "Lineup,Score,Salary,Players\n";
-        lineups.forEach(l => csv += `${l.id},${l.pts},${l.sal},"${l.names}"\n`);
-        const blob = new Blob([csv], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
+        let csv = "Lineup,Score,Players\n";
+        lineups.forEach(l => csv += `${l.id},${l.score},"${l.names.replace(/,/g, '|')}"\n`);
+        const b = new Blob([csv], { type: 'text/csv' });
         const a = document.createElement('a');
-        a.href = url; a.download = 'DiamondEdge_Lineups.csv';
+        a.href = window.URL.createObjectURL(b);
+        a.download = 'DiamondEdge_DraftKings.csv';
         a.click();
-        log("CSV Downloaded.");
     }
 </script>
 </body>
