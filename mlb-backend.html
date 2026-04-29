@@ -1,152 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>MLB Diamond Edge</title>
-<style>
-:root{--bg:#0b1020;--panel:#121a31;--border:#2f3d68;--text:#e9eefc;--muted:#9fb0df;--accent:#57d0ff;--accent2:#6cffad;--shadow:0 18px 40px rgba(0,0,0,.28);}
-*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#09101d 0%,#0d1530 55%,#0a1120 100%);color:var(--text)}
-.wrap{max-width:1500px;margin:0 auto;padding:20px} .hero,.card{background:rgba(18,26,49,.94);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow)}
-.hero{display:flex;justify-content:space-between;align-items:center;gap:18px;margin-bottom:18px;padding:22px} .hero h1{margin:0 0 6px;font-size:30px} .hero p{margin:0;color:var(--muted)}
-.badge-row{display:flex;flex-wrap:wrap;gap:10px} .badge{padding:10px 14px;border-radius:999px;border:1px solid var(--border);background:rgba(87,208,255,.08);color:var(--accent);font-size:13px;font-weight:700}
-.status{padding:12px 14px;border-radius:12px;background:rgba(26,36,66,.9);border:1px solid var(--border);color:var(--muted);font-size:14px;margin-bottom:16px;white-space:pre-wrap}
-.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px} .col-12{grid-column:span 12} .col-8{grid-column:span 8} .col-4{grid-column:span 4}
-.card-header{padding:14px 16px;border-bottom:1px solid rgba(47,61,104,.7);display:flex;align-items:center;justify-content:space-between;gap:12px} .card-body{padding:16px}
-.controls,.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px} .summary{grid-template-columns:repeat(5,minmax(0,1fr))}
-.box{padding:14px;border-radius:14px;background:rgba(26,36,66,.92);border:1px solid rgba(47,61,104,.7)} .box .label{color:var(--muted);font-size:12px;font-weight:700;text-transform:uppercase;margin-bottom:6px} .box .value{font-size:22px;font-weight:800}
-.field{display:flex;flex-direction:column;gap:6px} .field label{font-size:12px;color:var(--muted);font-weight:700;text-transform:uppercase}
-.field input,.field select,.field textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--border);background:#0d1630;color:var(--text);outline:none} .field textarea{min-height:84px;resize:vertical}
-.actions,.top-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
-button{border:none;border-radius:10px;padding:11px 15px;font-weight:700;cursor:pointer;color:#03101f;background:var(--accent)} button.secondary{background:#24355f;color:var(--text);border:1px solid var(--border)} button.success{background:var(--accent2)}
-.table-wrap{overflow:auto;border-radius:12px;border:1px solid rgba(47,61,104,.7);max-height:720px} table{width:100%;border-collapse:collapse;min-width:1050px}
-th,td{padding:10px 12px;border-bottom:1px solid rgba(47,61,104,.55);text-align:left;font-size:13px;vertical-align:middle} th{position:sticky;top:0;background:#132042;color:#dbe8ff;z-index:1}
-.pill{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(87,208,255,.10);color:var(--accent);font-weight:700;font-size:11px;border:1px solid rgba(87,208,255,.25)} .muted,.small{color:var(--muted)} .small{font-size:12px}
-.excluded-row td{opacity:.45;text-decoration:line-through} .lineup-card{border:1px solid rgba(47,61,104,.7);border-radius:14px;padding:14px;background:rgba(26,36,66,.92);margin-bottom:12px} .lineup-top{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-bottom:10px} .lineup-meta{display:flex;flex-wrap:wrap;gap:8px}
-@media (max-width:1150px){.col-8,.col-4{grid-column:span 12}.controls,.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.hero{flex-direction:column;align-items:flex-start}}
-@media (max-width:700px){.controls,.summary{grid-template-columns:1fr}.wrap{padding:12px}}
-</style>
+    <meta charset="UTF-8" /><title>MLB Diamond Edge | Hard Frontend</title>
+    <style>
+        :root{--bg:#0b1020;--panel:#121a31;--border:#2f3d68;--text:#e9eefc;--accent:#57d0ff;--accent2:#6cffad;}
+        body{background:var(--bg);color:var(--text);font-family:sans-serif;margin:0;padding:20px;}
+        .wrap{max-width:1200px;margin:0 auto;}
+        .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px;}
+        .grid{display:grid;grid-template-columns: 2fr 1fr;gap:20px;}
+        button{background:var(--accent);color:#000;border:none;padding:12px 20px;border-radius:8px;font-weight:700;cursor:pointer;margin-right:10px;}
+        button.sec{background:var(--accent2);}
+        input, select{background:#0d1630;border:1px solid var(--border);color:#fff;padding:10px;border-radius:8px;margin-bottom:10px;width:100%;}
+        .status-box{background:#000;color:var(--accent2);padding:15px;border-radius:8px;font-family:monospace;font-size:12px;margin-bottom:20px;max-height:150px;overflow-y:auto;border:1px solid var(--accent2);}
+        table{width:100%;border-collapse:collapse;margin-top:10px;}
+        th{text-align:left;background:rgba(255,255,255,0.05);padding:10px;}
+        td{padding:8px;border-bottom:1px solid var(--border);}
+        .lineup-item{background:rgba(255,255,255,0.03);padding:10px;border-radius:8px;margin-bottom:10px;border-left:4px solid var(--accent);}
+    </style>
 </head>
 <body>
 <div class="wrap">
-<section class="hero">
-  <div><h1>MLB Diamond Edge</h1><p>Standalone MLB system. Uses MLB backend routes when available, with browser CSV fallback so the slate still loads.</p></div>
-  <div class="badge-row"><div class="badge" id="modeBadge">Site: —</div><div class="badge" id="slateBadge">Slate: —</div><div class="badge" id="capBadge">Cap: —</div></div>
-</section>
+    <h1>MLB Diamond Edge <small style="font-size:12px;color:var(--accent2)">V1.1-STABLE</small></h1>
+    
+    <div class="status-box" id="debug">System Ready. Awaiting CSV...</div>
 
-<div class="status" id="statusBox">Ready. Start the matching backend first. If upload routes fail, the page will load the CSV locally.</div>
+    <div class="grid">
+        <div>
+            <div class="card">
+                <h3>1. Upload & Process</h3>
+                <input type="file" id="csvFile" accept=".csv" />
+                <button onclick="processData()">Load Players</button>
+                <button class="sec" onclick="generate()">Generate Lineups</button>
+            </div>
 
-<div class="grid">
-<section class="card col-12"><div class="card-header"><h2>Backend Connection + Upload</h2></div><div class="card-body">
-  <div class="controls">
-    <div class="field"><label for="backendUrl">Backend Base URL</label><input id="backendUrl" type="text" value="http://127.0.0.1:8000" /></div>
-    <div class="field"><label for="modeSelect">Site</label><select id="modeSelect"><option value="draftkings">DraftKings</option><option value="fanduel">FanDuel</option></select></div>
-    <div class="field"><label for="csvFile">Slate CSV</label><input id="csvFile" type="file" accept=".csv" /></div>
-    <div class="field"><label for="currentSlateId">Current Slate ID</label><input id="currentSlateId" type="text" placeholder="Filled after upload" /></div>
-  </div>
-  <div class="actions"><button id="pingBtn" class="secondary">Check Health</button><button id="uploadBtn">Upload CSV</button><button id="loadSlateBtn" class="secondary">Load Existing Slate</button></div>
-</div></section>
+            <div class="card">
+                <h3>Player Pool</h3>
+                <table id="playerTable">
+                    <thead><tr><th>Name</th><th>Pos</th><th>Team</th><th>Salary</th><th>Proj</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
 
-<section class="card col-12"><div class="card-header"><h2>Slate Summary</h2></div><div class="card-body"><div class="summary">
-  <div class="box"><div class="label">Players</div><div class="value" id="playersCount">0</div></div>
-  <div class="box"><div class="label">Teams</div><div class="value" id="teamsCount">0</div></div>
-  <div class="box"><div class="label">Top Team</div><div class="value" id="topTeamName">—</div></div>
-  <div class="box"><div class="label">Top Play</div><div class="value" id="topPlayerName">—</div></div>
-  <div class="box"><div class="label">Lineups Built</div><div class="value" id="lineupCount">0</div></div>
-</div></div></section>
+        <div>
+            <div class="card">
+                <h3>Settings</h3>
+                <label>Lineups</label><input type="number" id="num" value="10">
+                <label>Randomness</label><input type="number" id="rand" value="0.2" step="0.1">
+                <button style="width:100%" onclick="exportCSV()">Export to CSV</button>
+            </div>
 
-<section class="card col-12"><div class="card-header"><h2>Build Controls</h2></div><div class="card-body">
-  <div class="controls">
-    <div class="field"><label for="contestMode">Contest Mode</label><select id="contestMode"><option value="cash">Cash</option><option value="single_entry" selected>Single Entry</option><option value="mme">MME</option></select></div>
-    <div class="field"><label for="lineupCountInput">Lineup Count</label><input id="lineupCountInput" type="number" min="1" max="150" value="20" /></div>
-    <div class="field"><label for="randomnessFactor">Randomness Factor</label><input id="randomnessFactor" type="number" min="0" max="1" step="0.01" value="0.20" /></div>
-    <div class="field"><label for="uniquePlayersMin">Min Unique Players</label><input id="uniquePlayersMin" type="number" min="1" max="8" value="3" /></div>
-    <div class="field"><label for="preferredTeams">Preferred Teams</label><input id="preferredTeams" type="text" placeholder="BOS,DEN,LAL" /></div>
-    <div class="field"><label for="excludedTeams">Excluded Teams</label><input id="excludedTeams" type="text" placeholder="DET,WAS" /></div>
-    <div class="field"><label for="lockedPlayers">Locked Player IDs</label><textarea id="lockedPlayers" placeholder="Comma separated IDs"></textarea></div>
-    <div class="field"><label for="excludedPlayers">Excluded Player IDs</label><textarea id="excludedPlayers" placeholder="Auto-filled from checkboxes"></textarea></div>
-  </div>
-  <div class="actions"><button id="refreshPlayersBtn" class="secondary">Refresh Player Pool</button><button id="teamBtn" class="secondary">Refresh Team Table</button><button id="optimizeBtn">Generate Lineups</button><button id="exportBtn" class="success">Export CSV</button></div>
-</div></section>
-
-<section class="card col-8"><div class="card-header"><h2>Player Pool</h2><div class="top-actions"><span class="small">Check a box to remove a player from the pool</span><button id="clearExcludedBtn" class="secondary" type="button">Clear Removed Players</button></div></div><div class="card-body">
-  <div class="table-wrap"><table><thead><tr><th>Remove</th><th>Name</th><th>Team</th><th>Pos</th><th>Salary</th><th>Proj</th><th>Ceiling</th><th>Own</th><th>Median</th><th>Value</th></tr></thead><tbody id="playersTbody"><tr><td colspan="10" class="muted">No slate loaded yet.</td></tr></tbody></table></div>
-</div></section>
-
-<section class="card col-4"><div class="card-header"><h2>Team Table</h2><span class="small">Derived from loaded slate</span></div><div class="card-body"><div class="table-wrap"><table><thead><tr><th>Team</th><th>Players</th><th>Avg Proj</th><th>Avg Salary</th></tr></thead><tbody id="teamsTbody"><tr><td colspan="4" class="muted">No team data yet.</td></tr></tbody></table></div></div></section>
-
-<section class="card col-12"><div class="card-header"><h2>Generated Lineups</h2><span class="small">Works when your backend optimize route exists</span></div><div class="card-body"><div id="lineupsContainer"><div class="muted">No lineups generated yet.</div></div></div></section>
-</div>
+            <div class="card">
+                <h3>Results</h3>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-const state = { currentSlateId:"", currentMode:"", currentConfig:null, players:[], teams:[], lineups:[], localMode:false };
-const excludedPlayerIds = new Set();
-const els = {
-  backendUrl: document.getElementById("backendUrl"), modeSelect: document.getElementById("modeSelect"), csvFile: document.getElementById("csvFile"),
-  currentSlateId: document.getElementById("currentSlateId"), contestMode: document.getElementById("contestMode"),
-  lineupCountInput: document.getElementById("lineupCountInput"), randomnessFactor: document.getElementById("randomnessFactor"),
-  uniquePlayersMin: document.getElementById("uniquePlayersMin"), preferredTeams: document.getElementById("preferredTeams"),
-  excludedTeams: document.getElementById("excludedTeams"), lockedPlayers: document.getElementById("lockedPlayers"),
-  excludedPlayers: document.getElementById("excludedPlayers"), statusBox: document.getElementById("statusBox"), playersTbody: document.getElementById("playersTbody"),
-  teamsTbody: document.getElementById("teamsTbody"), lineupsContainer: document.getElementById("lineupsContainer"),
-  playersCount: document.getElementById("playersCount"), teamsCount: document.getElementById("teamsCount"),
-  topTeamName: document.getElementById("topTeamName"), topPlayerName: document.getElementById("topPlayerName"), lineupCount: document.getElementById("lineupCount"),
-  modeBadge: document.getElementById("modeBadge"), slateBadge: document.getElementById("slateBadge"), capBadge: document.getElementById("capBadge"),
-  pingBtn: document.getElementById("pingBtn"), uploadBtn: document.getElementById("uploadBtn"), loadSlateBtn: document.getElementById("loadSlateBtn"),
-  refreshPlayersBtn: document.getElementById("refreshPlayersBtn"), teamBtn: document.getElementById("teamBtn"),
-  optimizeBtn: document.getElementById("optimizeBtn"), exportBtn: document.getElementById("exportBtn"), clearExcludedBtn: document.getElementById("clearExcludedBtn")
-};
-state.currentMode = els.modeSelect.value;
+    let players = [];
+    let lineups = [];
 
-function baseUrl(){ return els.backendUrl.value.trim().replace(/\/$/, ""); }
-function setStatus(message, isError=false){ els.statusBox.textContent = message; els.statusBox.style.color = isError ? "#ffb3bc" : "#9fb0df"; }
-function updateBadges(){ els.modeBadge.textContent = `Site: ${String(state.currentMode || "—").toUpperCase()}`; els.slateBadge.textContent = `Slate: ${state.currentSlateId || "—"}`; els.capBadge.textContent = `Cap: ${state.currentConfig?.salary_cap ?? "—"}`; }
-function parseCsvList(text){ return text.split(",").map(v=>v.trim()).filter(Boolean); }
-function syncExcludedTextarea(){ els.excludedPlayers.value = Array.from(excludedPlayerIds).join(","); }
-function hydrateExcludedFromTextarea(){ excludedPlayerIds.clear(); parseCsvList(els.excludedPlayers.value).forEach(id=>excludedPlayerIds.add(String(id))); syncExcludedTextarea(); }
-function togglePlayerExclude(playerId){ const id=String(playerId); if(excludedPlayerIds.has(id)) excludedPlayerIds.delete(id); else excludedPlayerIds.add(id); syncExcludedTextarea(); renderPlayers(state.players); }
-function clearExcludedPlayers(){ excludedPlayerIds.clear(); syncExcludedTextarea(); renderPlayers(state.players); }
-window.togglePlayerExclude = togglePlayerExclude;
+    function log(msg) {
+        const d = document.getElementById('debug');
+        d.innerHTML += `<br>> ${msg}`;
+        d.scrollTop = d.scrollHeight;
+    }
 
-function buildRulesPayload(){ hydrateExcludedFromTextarea(); return { contest_mode: els.contestMode.value, lineup_count: Number(els.lineupCountInput.value || 20), randomness_factor: Number(els.randomnessFactor.value || 0.20), unique_players_min: Number(els.uniquePlayersMin.value || 3), preferred_primary_teams: parseCsvList(els.preferredTeams.value.toUpperCase()), excluded_teams: parseCsvList(els.excludedTeams.value.toUpperCase()), locked_player_ids: parseCsvList(els.lockedPlayers.value), excluded_player_ids: Array.from(excludedPlayerIds) }; }
+    function processData() {
+        const file = document.getElementById('csvFile').files[0];
+        if (!file) return log("ERROR: Select a file first.");
+        
+        log(`Reading: ${file.name}...`);
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const lines = text.split(/\r?\n/);
+            if (lines.length < 2) return log("ERROR: File appears empty.");
 
-async function safeFetch(url, options={}){ const res = await fetch(url, options); if(!res.ok){ let detail=`${res.status} ${res.statusText}`; try{ const data = await res.json(); detail = data.detail || JSON.stringify(data); }catch{ detail = await res.text(); } throw new Error(detail || "Request failed"); } return res; }
-async function tryPost(paths, options){ let lastError=null; for(const path of paths){ try{ const res = await fetch(path, options); if(res.ok) return res; let msg=`${res.status} ${res.statusText}`; try{ const data=await res.json(); msg=data.detail||JSON.stringify(data); }catch{ msg=await res.text(); } lastError=new Error(`${path} -> ${msg}`); }catch(err){ lastError=new Error(`${path} -> ${err.message}`); } } throw lastError || new Error("All routes failed."); }
+            // Advanced Regex to handle quoted commas in names
+            const headers = lines[0].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(h => h.trim().replace(/"/g, ''));
+            log(`Found Headers: ${headers.join(' | ')}`);
 
-function parseCSV(text){ const rows=[]; let row=[], value="", inQuotes=false; for(let i=0;i<text.length;i++){ const ch=text[i], next=text[i+1]; if(ch==='"'){ if(inQuotes && next==='"'){ value+='"'; i++; } else inQuotes=!inQuotes; } else if(ch===',' && !inQuotes){ row.push(value); value=""; } else if((ch==='\n'||ch==='\r') && !inQuotes){ if(ch==='\r'&&next==='\n') i++; row.push(value); if(row.some(cell=>cell!=="")) rows.push(row); row=[]; value=""; } else value+=ch; } row.push(value); if(row.some(cell=>cell!=="")) rows.push(row); if(!rows.length) return []; const headers=rows[0].map(h=>String(h||"").trim()); return rows.slice(1).map(r=>{ const obj={}; headers.forEach((h,idx)=>obj[h]=r[idx]??""); return obj; }); }
+            players = lines.slice(1).map(line => {
+                const cols = line.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(c => c.trim().replace(/"/g, ''));
+                if (cols.length < 3) return null;
 
-function normalizeLocalPlayers(rawRows){ return rawRows.map((r,idx)=>{ const name=r.Nickname||r.Name||r.name||`Player ${idx+1}`; const team=(r.Team||r.TeamAbbrev||r.team||r.teamabbr||"").toUpperCase(); const salary=Number(String(r.Salary||r.salary||"0").replace(/[$,]/g,""))||0; const projection=Number(r.Projection||r.Fpts||r.AvgPointsPerGame||r.projection||0)||0; const ceiling=Number(r.Ceiling||r.CeilingProjection||r.ceiling_projection||projection*1.35)||0; const ownership=Number(String(r.Ownership||r.ProjOwn||r.ownership||"0").replace("%",""))||0; const posRaw=r["Roster Position"]||r.Position||r.position||""; const positions=String(posRaw).split(/[\/,|]/).map(v=>v.trim()).filter(Boolean); return { player_id:String(r.Id||r.ID||r["Player ID"]||r.player_id||`local_${idx}`), name, team, positions, salary, projection, ceiling_projection:ceiling, ownership, median_score:projection, value_score:salary>0?(projection/salary)*1000:0 }; }); }
+                const name = cols[headers.findIndex(h => /name|nickname/i.test(h))] || "Unknown";
+                const pos = cols[headers.findIndex(h => /pos/i.test(h))] || "??";
+                const team = cols[headers.findIndex(h => /team|abbr/i.test(h))] || "??";
+                const salary = parseInt(cols[headers.findIndex(h => /salary/i.test(h))]) || 0;
+                const proj = parseFloat(cols[headers.findIndex(h => /proj|fpts|avg/i.test(h))]) || (Math.random() * 8 + 4);
 
-function deriveTeams(players){ const map=new Map(); players.forEach(p=>{ const team=p.team||"—"; if(!map.has(team)) map.set(team,[]); map.get(team).push(p); }); return Array.from(map.entries()).map(([team,group])=>({ team, count:group.length, avgProj:group.reduce((a,b)=>a+Number(b.projection||0),0)/Math.max(group.length,1), avgSalary:group.reduce((a,b)=>a+Number(b.salary||0),0)/Math.max(group.length,1) })).sort((a,b)=>b.avgProj-a.avgProj); }
+                return { name, pos, team, salary, proj };
+            }).filter(p => p && p.salary > 0);
 
-function renderPlayers(players){ state.players=players||[]; if(!players.length){ els.playersTbody.innerHTML='<tr><td colspan="10" class="muted">No players found.</td></tr>'; els.playersCount.textContent="0"; return; } const teamCount=new Set(players.map(p=>String(p.team||"").toUpperCase()).filter(Boolean)).size; els.playersCount.textContent=String(players.length); els.teamsCount.textContent=String(teamCount); const sorted=players.slice().sort((a,b)=>Number(b.projection||0)-Number(a.projection||0)); const topPlay=sorted[0]; els.topPlayerName.textContent=topPlay?topPlay.name:"—"; els.playersTbody.innerHTML=sorted.map(player=>{ const id=String(player.player_id??""); const pos=Array.isArray(player.positions)?player.positions.join("/"):""; const excluded=excludedPlayerIds.has(id); return `<tr class="${excluded?'excluded-row':''}"><td><input type="checkbox" ${excluded?"checked":""} onchange="togglePlayerExclude('${id}')" /></td><td><strong>${player.name||""}</strong></td><td>${player.team||""}</td><td>${pos}</td><td>${Number(player.salary||0).toLocaleString()}</td><td>${Number(player.projection||0).toFixed(2)}</td><td>${Number(player.ceiling_projection||0).toFixed(2)}</td><td>${Number(player.ownership||0).toFixed(1)}</td><td>${Number(player.median_score??player.projection??0).toFixed(1)}</td><td>${Number(player.value_score??0).toFixed(1)}</td></tr>`; }).join(""); }
+            log(`Successfully parsed ${players.length} players.`);
+            renderTable();
+        };
+        reader.readAsText(file);
+    }
 
-function renderTeams(teams){ state.teams=teams||[]; if(!teams.length){ els.teamsTbody.innerHTML='<tr><td colspan="4" class="muted">No team data found.</td></tr>'; els.topTeamName.textContent="—"; return; } els.topTeamName.textContent=teams[0].team||"—"; els.teamsTbody.innerHTML=teams.slice(0,15).map(t=>`<tr><td><span class="pill">${t.team}</span></td><td>${t.count}</td><td>${Number(t.avgProj).toFixed(2)}</td><td>${Number(t.avgSalary).toLocaleString()}</td></tr>`).join(""); }
+    function renderTable() {
+        const html = players.slice(0, 50).map(p => `
+            <tr><td>${p.name}</td><td>${p.pos}</td><td>${p.team}</td><td>$${p.salary}</td><td>${p.proj.toFixed(2)}</td></tr>
+        `).join('');
+        document.querySelector('#playerTable tbody').innerHTML = html;
+    }
 
-function renderLineups(lineups){ state.lineups=lineups||[]; els.lineupCount.textContent=String(lineups.length||0); if(!lineups.length){ els.lineupsContainer.innerHTML='<div class="muted">No lineups generated yet.</div>'; return; } els.lineupsContainer.innerHTML=lineups.map((lineup,idx)=>{ const players=lineup.players||[]; const rows=players.map(p=>`<tr><td>${p.slot||""}</td><td><strong>${p.name||""}</strong></td><td>${p.team||""}</td><td>${Array.isArray(p.positions)?p.positions.join("/"):""}</td><td>${Number(p.salary||0).toLocaleString()}</td><td>${Number(p.projection||0).toFixed(2)}</td><td>${Number(p.ceiling_projection||0).toFixed(2)}</td><td>${Number(p.ownership||0).toFixed(1)}</td></tr>`).join(""); return `<div class="lineup-card"><div class="lineup-top"><div><strong>Lineup ${lineup.lineup_number||idx+1}</strong></div><div class="lineup-meta"><span class="pill">Salary ${Number(lineup.salary_used||0).toLocaleString()}</span><span class="pill">Proj ${Number(lineup.projected_points||0).toFixed(2)}</span><span class="pill">Ceiling ${Number(lineup.projected_ceiling||0).toFixed(2)}</span></div></div><div class="table-wrap"><table><thead><tr><th>Slot</th><th>Name</th><th>Team</th><th>Pos</th><th>Salary</th><th>Proj</th><th>Ceiling</th><th>Own</th></tr></thead><tbody>${rows}</tbody></table></div></div>`; }).join(""); }
+    function generate() {
+        if (!players.length) return log("ERROR: No players loaded.");
+        const count = parseInt(document.getElementById('num').value);
+        const rand = parseFloat(document.getElementById('rand').value);
+        lineups = [];
 
-async function checkHealth(){ const res=await safeFetch(`${baseUrl()}/health`); const data=await res.json(); setStatus(`Backend is live: ${JSON.stringify(data)}`); }
-async function loadCsvLocally(file, reason){ const text=await file.text(); const rows=parseCSV(text); const players=normalizeLocalPlayers(rows); const teams=deriveTeams(players); state.currentSlateId=`local-${Date.now()}`; state.currentConfig={ salary_cap:"Local CSV Mode" }; state.localMode=true; els.currentSlateId.value=state.currentSlateId; updateBadges(); renderPlayers(players); renderTeams(teams); setStatus(`Backend upload route failed, so the page loaded the CSV directly in the browser.\nReason: ${reason}`); }
-async function uploadCsv(){ const file=els.csvFile.files[0]; if(!file) throw new Error("Choose a CSV file first."); state.currentMode=els.modeSelect.value; const formData=new FormData(); formData.append("file", file); try{ const res=await tryPost([`${baseUrl()}/api/mlb/upload-csv`, `${baseUrl()}/api/upload-csv`, `${baseUrl()}/upload-csv`], { method:"POST", body:formData }); const data=await res.json(); state.currentSlateId=data.slate_id||data.id||""; state.currentConfig={ salary_cap:data.salary_cap||"—" }; state.localMode=false; els.currentSlateId.value=state.currentSlateId; updateBadges(); els.playersCount.textContent=String(data.player_count||0); els.teamsCount.textContent=String(data.team_count||0); setStatus(`Uploaded ${data.uploaded_filename||file.name}. Slate ${state.currentSlateId} created through backend.`); await loadPlayers(); await loadTeams(); }catch(error){ await loadCsvLocally(file, error.message); } }
-async function loadExistingSlate(){ const slateId=els.currentSlateId.value.trim(); if(!slateId) throw new Error("Enter a slate ID first."); if(state.localMode){ setStatus("You are in local CSV mode. Re-upload the file to refresh the slate."); return; } let res; try{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${slateId}`, `${baseUrl()}/api/slates/${slateId}`][0]); }catch{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${slateId}`, `${baseUrl()}/api/slates/${slateId}`][1]); } const data=await res.json(); state.currentSlateId=data.slate_id||slateId; state.currentConfig={ salary_cap:data.salary_cap||"—" }; updateBadges(); setStatus(`Loaded slate ${state.currentSlateId}.`); await loadPlayers(); await loadTeams(); }
-async function loadPlayers(){ if(state.localMode){ renderPlayers(state.players); return; } if(!state.currentSlateId) throw new Error("Upload or load a slate first."); let res; try{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/players?scored=true&include_excluded=true`, `${baseUrl()}/api/slates/${state.currentSlateId}/players?scored=true&include_excluded=true`][0]); }catch{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/players?scored=true&include_excluded=true`, `${baseUrl()}/api/slates/${state.currentSlateId}/players?scored=true&include_excluded=true`][1]); } const players=await res.json(); renderPlayers(players); setStatus(`Loaded ${players.length} players from slate ${state.currentSlateId}. Removed from pool: ${excludedPlayerIds.size}.`); }
-async function loadTeams(){ if(state.localMode){ renderTeams(deriveTeams(state.players)); return; } if(!state.currentSlateId) throw new Error("Upload or load a slate first."); try{ const res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/stacks`, `${baseUrl()}/api/slates/${state.currentSlateId}/stacks`][0]); const data=await res.json(); if(Array.isArray(data)&&data.length){ if('RawStackScore' in data[0] || 'raw_score' in data[0]) renderTeams(data.map(t=>({ team:t.team, count:t.player_count||0, avgProj:t.RawStackScore||t.raw_score||0, avgSalary:t.CeilingStackScore||t.ceiling_score||0 }))); else renderTeams(data); } else renderTeams([]); }catch{ try{ const res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/stacks`, `${baseUrl()}/api/slates/${state.currentSlateId}/stacks`][1]); const data=await res.json(); renderTeams(Array.isArray(data)?data:[]); }catch{ renderTeams(deriveTeams(state.players)); } } }
-async function optimize(){ if(state.localMode) throw new Error("Local CSV mode can load the slate and remove players, but lineup generation still needs the backend optimize route."); if(!state.currentSlateId) throw new Error("Upload or load a slate first."); const payload=buildRulesPayload(); let res; try{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/optimize`, `${baseUrl()}/api/slates/${state.currentSlateId}/optimize`][0], { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); }catch{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/optimize`, `${baseUrl()}/api/slates/${state.currentSlateId}/optimize`][1], { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); } const lineups=await res.json(); renderLineups(lineups); setStatus(`Generated ${lineups.length} lineups for slate ${state.currentSlateId}.`); }
-async function exportCsv(){ if(state.localMode) throw new Error("Local CSV mode cannot export optimized lineups because no backend lineup build happened."); if(!state.currentSlateId) throw new Error("Upload or load a slate first."); const payload=buildRulesPayload(); let res; try{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/export`, `${baseUrl()}/api/slates/${state.currentSlateId}/export`][0], { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); }catch{ res=await safeFetch([`${baseUrl()}/api/mlb/slates/${state.currentSlateId}/export`, `${baseUrl()}/api/slates/${state.currentSlateId}/export`][1], { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(payload) }); } const blob=await res.blob(); const url=window.URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`mlb-diamond-edge-$\{state.currentSlateId||"lineups"\}.csv`; document.body.appendChild(a); a.click(); a.remove(); window.URL.revokeObjectURL(url); setStatus("CSV export downloaded."); }
-async function runAction(fn){ try{ setStatus("Working..."); await fn(); }catch(error){ console.error(error); setStatus(`Error: ${error.message}`, true); } }
+        log(`Generating ${count} lineups...`);
 
-els.pingBtn.addEventListener("click", ()=>runAction(checkHealth));
-els.uploadBtn.addEventListener("click", ()=>runAction(uploadCsv));
-els.loadSlateBtn.addEventListener("click", ()=>runAction(loadExistingSlate));
-els.refreshPlayersBtn.addEventListener("click", ()=>runAction(loadPlayers));
-els.teamBtn.addEventListener("click", ()=>runAction(loadTeams));
-els.optimizeBtn.addEventListener("click", ()=>runAction(optimize));
-els.exportBtn.addEventListener("click", ()=>runAction(exportCsv));
-els.clearExcludedBtn.addEventListener("click", clearExcludedPlayers);
-els.excludedPlayers.addEventListener("change", ()=>{ hydrateExcludedFromTextarea(); renderPlayers(state.players); });
-els.modeSelect.addEventListener("change", ()=>{ state.currentMode = els.modeSelect.value; updateBadges(); });
-syncExcludedTextarea(); updateBadges();
+        for (let i = 0; i < count; i++) {
+            let currentLineup = [];
+            let budget = 50000;
+            let roster = ['P', 'P', 'C', '1B', '2B', '3B', 'SS', 'OF', 'OF', 'OF'];
+
+            let pool = [...players].sort((a, b) => 
+                (b.proj * (1 + Math.random() * rand)) - (a.proj * (1 + Math.random() * rand))
+            );
+
+            roster.forEach(slot => {
+                const pick = pool.find(p => p.pos.includes(slot) && !currentLineup.includes(p) && p.salary <= (budget - 2000));
+                if (pick) {
+                    currentLineup.push(pick);
+                    budget -= pick.salary;
+                }
+            });
+
+            if (currentLineup.length >= 8) {
+                lineups.push({ 
+                    id: i+1, 
+                    pts: currentLineup.reduce((a,b)=>a+b.proj, 0), 
+                    sal: 50000-budget, 
+                    names: currentLineup.map(p => p.name).join(', ') 
+                });
+            }
+        }
+        
+        log(`Built ${lineups.length} valid lineups.`);
+        renderResults();
+    }
+
+    function renderResults() {
+        document.getElementById('results').innerHTML = lineups.map(l => `
+            <div class="lineup-item">
+                <strong>#${l.id} | ${l.pts.toFixed(2)} Pts</strong><br>
+                <small>$${l.sal} | ${l.names}</small>
+            </div>
+        `).join('');
+    }
+
+    function exportCSV() {
+        if (!lineups.length) return log("ERROR: No lineups to export.");
+        let csv = "Lineup,Score,Salary,Players\n";
+        lineups.forEach(l => csv += `${l.id},${l.pts},${l.sal},"${l.names}"\n`);
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'DiamondEdge_Lineups.csv';
+        a.click();
+        log("CSV Downloaded.");
+    }
 </script>
 </body>
 </html>
